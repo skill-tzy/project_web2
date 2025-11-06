@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 
 const API = "http://127.0.0.1:8000/api";
+const TOKEN = "3|63NBrroI2CscqI45wywgfKhGWweQ0yjrgW0siuBwef0c1a9d"; // token dari login
 
 export default function App() {
   const [todos, setTodos] = useState([]);
@@ -14,9 +15,16 @@ export default function App() {
     setErr("");
 
     try {
-      const r = await fetch(`${API}/todos`);
-      if (!r.ok) throw new Error("Gagal memuat");
-      setTodos(await r.json());
+      const r = await fetch(`${API}/todos`, {
+        headers: {
+          Authorization: `Bearer ${TOKEN}`,
+          "Content-Type": "application/json",
+        },
+      });
+
+      if (!r.ok) throw new Error("Gagal memuat todos");
+      const data = await r.json();
+      setTodos(data);
     } catch (e) {
       setErr(e.message);
     } finally {
@@ -32,11 +40,14 @@ export default function App() {
     try {
       const r = await fetch(`${API}/todos`, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${TOKEN}`,
+        },
         body: JSON.stringify({ title }),
       });
 
-      if (!r.ok) throw new Error("Gagal menambah");
+      if (!r.ok) throw new Error("Gagal menambah todo");
       setTitle("");
       await load();
     } catch (e) {
