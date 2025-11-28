@@ -9,11 +9,13 @@ use Illuminate\Http\Request;
 class TodoController extends Controller
 {
     /**
-     * Tampilkan semua todo (urut dari yang terbaru)
+     * Tampilkan semua todo (hanya todo milik user yg login)
      */
-    public function index()
+    public function index(Request $request)
     {
-        return Todo::orderByDesc('id')->get();
+        return Todo::where('user_id', $request->user()->id)
+                   ->orderByDesc('id')
+                   ->get();
     }
 
     /**
@@ -26,16 +28,30 @@ class TodoController extends Controller
             'completed' => 'boolean',
         ]);
 
+        // Tambahkan user_id otomatis
+        $data['user_id'] = $request->user()->id;
+
         $todo = Todo::create($data);
 
         return response()->json($todo, 201);
     }
 
     /**
+     * Cek kepemilikan todo
+     */
+    private function authorizeOwner(Todo $todo, Request $request)
+    {
+        if ($todo->user_id !== $request->user()->id) {
+            abort(403, 'Forbidden');
+        }
+    }
+
+    /**
      * Tampilkan detail todo berdasarkan ID
      */
-    public function show(Todo $todo)
+    public function show(Request $request, Todo $todo)
     {
+        $this->authorizeOwner($todo, $request);
         return $todo;
     }
 
@@ -44,6 +60,8 @@ class TodoController extends Controller
      */
     public function update(Request $request, Todo $todo)
     {
+        $this->authorizeOwner($todo, $request);
+
         $data = $request->validate([
             'title'     => 'sometimes|string|max:100',
             'completed' => 'sometimes|boolean',
@@ -57,8 +75,10 @@ class TodoController extends Controller
     /**
      * Hapus todo berdasarkan ID
      */
-    public function destroy(Todo $todo)
+    public function destroy(Request $request, Todo $todo)
     {
+        $this->authorizeOwner($todo, $request);
+
         $todo->delete();
 
         return response()->noContent(); // 204 No Content
