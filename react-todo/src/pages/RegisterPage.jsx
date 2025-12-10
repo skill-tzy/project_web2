@@ -14,13 +14,11 @@ function RegisterPage() {
   const [loading, setLoading] = useState(false);
 
   const navigate = useNavigate();
-  const { login } = useAuth(); // dari AuthContext
+  const { login } = useAuth();
 
   const handleChange = (e) => {
-    setForm((prev) => ({
-      ...prev,
-      [e.target.name]: e.target.value,
-    }));
+    const { name, value } = e.target;
+    setForm((prev) => ({ ...prev, [name]: value }));
   };
 
   const handleSubmit = async (e) => {
@@ -39,63 +37,89 @@ function RegisterPage() {
   };
 
   return (
-    <main style={{ padding: '2rem' }}>
-      <h1>Register</h1>
+    <section className="card">
+      <header className="card-header">
+        <h1 className="card-title">Buat Akun Baru</h1>
+        <p className="card-subtitle">
+          Daftar terlebih dahulu untuk bisa mengelola Todo dari Laravel API.
+        </p>
+      </header>
 
-      <form
-        onSubmit={handleSubmit}
-        style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem', maxWidth: 400 }}
-      >
-        <label>
-          Nama
-          <input
-            name="name"
-            value={form.name}
-            onChange={handleChange}
-            required
-          />
-        </label>
+      <div className="card-body">
+        <form className="form-vertical" onSubmit={handleSubmit}>
+          <div className="form-field">
+            <label className="form-label" htmlFor="name">
+              Nama
+            </label>
+            <input
+              id="name"
+              name="name"
+              className="input"
+              value={form.name}
+              onChange={handleChange}
+              required
+            />
+          </div>
 
-        <label>
-          Email
-          <input
-            name="email"
-            type="email"
-            value={form.email}
-            onChange={handleChange}
-            required
-          />
-        </label>
+          <div className="form-field">
+            <label className="form-label" htmlFor="email">
+              Email
+            </label>
+            <input
+              id="email"
+              name="email"
+              type="email"
+              className="input"
+              value={form.email}
+              onChange={handleChange}
+              required
+            />
+          </div>
 
-        <label>
-          Password
-          <input
-            name="password"
-            type="password"
-            value={form.password}
-            onChange={handleChange}
-            required
-          />
-        </label>
+          <div className="form-field">
+            <label className="form-label" htmlFor="password">
+              Password
+            </label>
+            <input
+              id="password"
+              name="password"
+              type="password"
+              className="input"
+              value={form.password}
+              onChange={handleChange}
+              required
+            />
+          </div>
 
-        <label>
-          Konfirmasi Password
-          <input
-            name="password_confirmation"
-            type="password"
-            value={form.password_confirmation}
-            onChange={handleChange}
-            required
-          />
-        </label>
+          <div className="form-field">
+            <label className="form-label" htmlFor="password_confirmation">
+              Konfirmasi Password
+            </label>
+            <input
+              id="password_confirmation"
+              name="password_confirmation"
+              type="password"
+              className="input"
+              value={form.password_confirmation}
+              onChange={handleChange}
+              required
+            />
+          </div>
 
-        <button type="submit" disabled={loading}>
-          {loading ? 'Mendaftar...' : 'Daftar'}
-        </button>
+          {error && (
+            <div className="alert alert-error">
+              {error}
+            </div>
+          )}
 
-        {error && <p style={{ color: 'crimson' }}>{error}</p>}
-      </form>
-    </main>
+          <div className="btn-row">
+            <button type="submit" className="btn btn-primary" disabled={loading}>
+              {loading ? 'Mendaftar...' : 'Daftar'}
+            </button>
+          </div>
+        </form>
+      </div>
+    </section>
   );
 }
 
